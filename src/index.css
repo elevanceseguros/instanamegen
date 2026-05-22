@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-brand-dark text-white;
+  }
+}
+
+@layer components {
+  .name-card {
+    @apply bg-brand-card border border-white/10 rounded-xl px-4 py-3 text-center
+           hover:border-brand-primary/60 hover:bg-brand-primary/10 
+           cursor-pointer transition-all duration-200 select-none;
+  }
+  .btn-primary {
+    @apply bg-brand-primary hover:bg-brand-primary/90 text-white font-bold 
+           py-4 px-8 rounded-xl transition-all duration-200 
+           disabled:opacity-50 disabled:cursor-not-allowed text-lg;
+  }
+  .category-pill {
+    @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+           border border-white/20 hover:border-brand-primary/60;
+  }
+  .category-pill.active {
+    @apply bg-brand-primary border-brand-primary text-white;
+  }
+}
