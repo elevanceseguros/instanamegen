@@ -86,27 +86,21 @@ export default function GeneratorPage({ category, allCategories }) {
   const fetchNames = async () => {
     try {
       const keywordNote = keyword ? ` The user wants names related to or inspired by: "${keyword}".` : ''
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const prompt = `${category.prompt}${keywordNote} Return ONLY the names and notes, no intro text, no numbering, no extra explanation.`
+
+      const response = await fetch('/api/generate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 1024,
-          messages: [{
-            role: 'user',
-            content: `${category.prompt}${keywordNote} Return ONLY the names and notes, no intro text, no numbering, no extra explanation.`
-          }]
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
       })
+
       const data = await response.json()
-      const text = data.content?.[0]?.text || ''
-      return text.split('\n').filter(line => line.trim().length > 0)
+
+      if (!response.ok) throw new Error(data.error || 'API error')
+
+      return data.names || []
     } catch (e) {
-      return ['Error generating names. Please try again.']
+      return [`Error: ${e.message}. Please try again.`]
     }
   }
 
@@ -154,24 +148,24 @@ export default function GeneratorPage({ category, allCategories }) {
           <label className="block text-sm text-white/60 mb-2">
             Optional: add a keyword or theme to personalize your results
           </label>
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
             <input
               type="text"
               value={keyword}
               onChange={e => setKeyword(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && generateNames()}
               placeholder={`e.g. "nature", "strong", "funny"...`}
-              className="flex-1 bg-brand-dark border border-white/20 rounded-xl px-4 py-3 
+              className="w-full bg-brand-dark border border-white/20 rounded-xl px-4 py-3 
                          text-white placeholder-white/30 focus:outline-none focus:border-brand-primary/60
                          transition-colors"
             />
             <button
               onClick={() => generateNames()}
               disabled={loading}
-              className="btn-primary whitespace-nowrap"
+              className="btn-primary w-full"
             >
               {loading ? (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
