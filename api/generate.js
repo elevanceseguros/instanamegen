@@ -9,12 +9,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing prompt' })
   }
 
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.VITE_ANTHROPIC_API_KEY
+  console.log('KEY present:', !!apiKey, '| prefix:', apiKey?.substring(0, 20))
+
+  if (!apiKey) {
+    return res.status(500).json({ error: 'API key not configured on server' })
+  }
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || process.env.VITE_ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
@@ -27,6 +34,7 @@ export default async function handler(req, res) {
     const data = await response.json()
 
     if (!response.ok) {
+      console.log('Anthropic error:', JSON.stringify(data))
       return res.status(response.status).json({ error: data.error?.message || 'API error' })
     }
 
@@ -35,6 +43,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ names })
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' })
+    console.log('Catch error:', error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
