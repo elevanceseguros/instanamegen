@@ -6,7 +6,7 @@ export default function Layout({ children }) {
       <header className="border-b border-white/10 py-4 px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group">
-            <span className="text-2xl">⚡</span>
+            <span className="text-2xl">🚀</span>
             <span className="font-extrabold text-xl tracking-tight">
               Insta<span className="text-brand-primary">Name</span>Gen
             </span>
